@@ -2,7 +2,7 @@ import base64
 import logging
 from io import BytesIO
 import os.path
-
+import tempfile
 from django.core.urlresolvers import NoReverseMatch
 from django.http import HttpResponse, HttpResponseBadRequest
 from django.utils.translation import ugettext as _
@@ -32,7 +32,9 @@ def capture(request):
     m = hashlib.sha256()
     m.update(str(url).encode('utf-8'))
     url_md5 = m.hexdigest()
-    media_path = 'media/%s.png' % url_md5
+    temp_dir = tempfile.gettempdir()
+
+    media_path = '%s/%s.png' % (temp_dir, url_md5)
     if os.path.isfile(media_path):
         f = open(media_path, 'rb')
         response = HttpResponse(content_type=image_mimetype(render))
